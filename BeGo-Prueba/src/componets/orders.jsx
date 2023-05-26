@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import Header from "./header";
-import { BiSearch, BiBusSchool } from "react-icons/bi";
+import { BiSearch, BiBusSchool, BiBox } from "react-icons/bi";
 
 const Order = () => {
   const [data, setData] = useState([]);
@@ -10,7 +10,14 @@ const Order = () => {
       "https://129bc152-6319-4e38-b755-534a4ee46195.mock.pstmn.io/orders/upcoming"
     )
       .then((result) => result.json())
-      .then((data) => setData(data));
+      .then((data) => {
+        setData(data);
+        const address = data.result[0].destinations[0].address;
+        console.log(address);
+      })
+      .catch((error) => {
+        console.error("Error al obtener los datos:", error);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -34,18 +41,27 @@ const Order = () => {
               data.result.map((order) => (
                 //verificamos que sea un array para usar el método map
                 <li key={order._id} className="relative text-white">
-                  <div className="flex align-items-center ">
+                  <div className="flex align-items-center">
                     <p className="mt-5 ml-3">Order #{order.order_number}</p>
                   </div>
-                  <div className="flex items-start p-4 bg-gray-900 w-[350px] h-[292px] text-gray-200 rounded-lg  mt-4 justify-start">
-                    <div className="flex items-start" >
-                        <div className="flex justif">
-                            <BiBusSchool className="text-white ml-7 " />
-                            <p className="flex mr-[100px]">{order.type}</p>
+                  <div className="flex items-start p-4 bg-gray-900 w-[450px] h-[292px] text-gray-200 rounded-lg  mt-4 justify-start">
+                    <div className="flex flex-wrap">
+                      <div className="flex">
+                        <BiBusSchool className="text-white ml-7" />
+                        <p className="flex mr-[100px] ">{order.type}</p>
+                      </div>
+                      <div className="flex justify-center">
+                        <p>{order.status_string}</p>
+                      </div>
+                      <div className="flex">
+                        <div className="flex p-4 mt-[10px]">
+                            <BiBox className="text-white text-5xl ml-7"/>
+                         <p className="flex">Pickup: {order.destinations[0].address}</p>
                         </div>
-                        <div className="flex justify-center">
-                            <p>{order.status_string}</p>
-                        </div>
+                      </div>
+                      <div>
+                        <button type="button" className="bg-yellow-500 p-4 rounded-lg">Resume</button>
+                      </div>
                     </div>
                   </div>
                 </li>
@@ -58,4 +74,6 @@ const Order = () => {
 };
 
 export default Order;
+
+
 
