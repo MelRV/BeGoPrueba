@@ -1,21 +1,23 @@
 import { useState, useEffect } from "react";
 import Header from "./header";
-import { BiSearch,BiBusSchool } from 'react-icons/bi'
+import { BiSearch, BiBusSchool } from "react-icons/bi";
 
 const Order = () => {
   const [data, setData] = useState([]);
 
   useEffect(() => {
-    fetch('https://129bc152-6319-4e38-b755-534a4ee46195.mock.pstmn.io/orders/upcoming')
-      .then(result => result.json())
+    fetch(
+      "https://129bc152-6319-4e38-b755-534a4ee46195.mock.pstmn.io/orders/upcoming"
+    )
+      .then((result) => result.json())
       .then((data) => setData(data));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
     <>
-      <Header /> 
-      <div className="flex justify-start mt-11 width-full">
+      <Header />
+      <div className="flex justify-center mt-11 width-full">
         <button type="submit">
           <BiSearch className="text-white ml-7 text-2xl bg-gray" />
         </button>
@@ -25,23 +27,35 @@ const Order = () => {
           placeholder="Search"
         />
       </div>
-      <div className="flex justify-start ml-8">
-        <div className="flex mt-9">
-        <ul>
-            {Array.isArray(data.result) && data.result.map((order) => (
+      <div className="flex justify-center mx-auto">
+        <div className="md:col-span-3 flex relative">
+          <ul>
+            {Array.isArray(data.result) &&
+              data.result.map((order) => (
                 //verificamos que sea un array para usar el método map
-            <li key={order.id} className="text-white">
-                <p className="mt-5 ml-3">Order #{order.order_number}</p>
-                <p className="flex">{order.status_string}</p>
-                <BiBusSchool className="text-white ml-7"/>
-                <p>{order.type}</p>
+                <li key={order._id} className="relative text-white">
+                  <div className="flex align-items-center ">
+                    <p className="mt-5 ml-3">Order #{order.order_number}</p>
+                  </div>
+                  <div className="flex items-start p-4 bg-gray-900 w-[350px] h-[292px] text-gray-200 rounded-lg  mt-4 justify-start">
+                    <div className="flex items-start" >
+                        <div className="flex justif">
+                            <BiBusSchool className="text-white ml-7 " />
+                            <p className="flex mr-[100px]">{order.type}</p>
+                        </div>
+                        <div className="flex justify-center">
+                            <p>{order.status_string}</p>
+                        </div>
+                    </div>
+                  </div>
                 </li>
-            ))}
-            </ul>
-            </div>
+              ))}
+          </ul>
+        </div>
       </div>
     </>
   );
-}
+};
 
 export default Order;
+
