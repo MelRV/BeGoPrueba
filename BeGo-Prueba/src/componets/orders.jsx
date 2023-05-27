@@ -27,7 +27,7 @@ const Order = () => {
   }, []);
 
   const handleResumeClick = (orderId) => {
-    window.location.href = `/cargo/${orderId}`; // Ruta de la página de información de la orden
+    window.location.href = `/cargo}`; // Ruta de la página de información de la orden
   };
 
   const handleSearch = () => {
