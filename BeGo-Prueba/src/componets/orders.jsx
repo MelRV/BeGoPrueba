@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
-import { BiSearch, BiBusSchool, BiBox, BiExpandAlt } from "react-icons/bi";
+import { BiSearch } from "react-icons/bi";
 import Header from "./header";
+import { calculateTimeDifference } from "../functions";
+
 
 const Order = () => {
   const [data, setData] = useState([]);
@@ -30,7 +32,7 @@ const Order = () => {
 
   const handleSearch = () => {
     const filteredOrders = data.result.filter(
-      (order) => order.order_number === searchText
+      (order) => order.order_number.includes(searchText)
     );
     setFilteredData(filteredOrders);
     setShowAllOrders(false);
@@ -39,136 +41,213 @@ const Order = () => {
   return (
     <>
       <Header />
-      <div className="flex justify-center mt-11 width-full xl:w-1/6">
-        <button type="submit" onClick={handleSearch}>
+      <div className="grid grid-cols-12 mt-11 width-full ">
+        <button type="submit" onClick={handleSearch} className="grid col-start-2 col-end-2">
           <BiSearch className="text-white ml-7 text-2xl bg-gray" />
         </button>
         <input
-          className="bg-transparent border-x-0 border-t-0 border-b-1 width-full mr-3 px-2 leading-tight focus:outline-none text-white"
+          className="bg-transparent border-x-0 border-t-0 border-b-1 width-full mr-3 px-2 leading-tight focus:outline-none text-white col-start-3 col-end-12"
           type="text"
           placeholder="Search"
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
         />
       </div>
-      <div className="flex justify-center mx-auto">
-        <div className="md:col-span-3 flex relative">
-          <ul>
-            {showAllOrders &&
-              Array.isArray(data.result) &&
-              data.result.map((order) => (
-                <li key={order._id} className="relative text-white">
-                  <div className="flex align-items-center">
-                    <p className="mt-5 ml-3">Order #{order.order_number}</p>
+      <div className="grid grid-cols-12">
+        {showAllOrders &&
+          Array.isArray(data.result) &&
+          data.result.map((order) => (
+            <div key={order._id} className="col-start-2 col-end-12">
+              <div className="flex align-items-center">
+                <p className="text-lg mt-5 ml-3">
+                  Order <strong className="ml-1">#{order.order_number}</strong>
+                </p>
+              </div>
+              <div className="card-bg rounded-[25px] flex items-start p-4 w-full text-gray-200 rounded-lg mt-4 justify-start">
+                <div className="flex flex-wrap">
+                  <div className="grid grid-cols-2 w-full pb-2 card-header">
+                    <div className="inline-block align-center">
+                      <img src="freight.svg" alt="" className="text-white-text-3xl inline-block pr-2" />
+                      <span className="inline-block">{order.type}</span>
+                    </div>
+                    <div className="inline-block text-right mr-1">
+                      <div className={`${order.status_class} inline-block mr-1`}></div>
+                      <span>{order.status_string}</span>
+                    </div>
                   </div>
-                  <div className="flex items-start p-4 bg-gray-900 w-[450px] h-[292px] text-gray-200 rounded-lg mt-4 justify-start">
-                    <div className="flex flex-wrap">
-                      <div className="flex justify-center">
-                        <BiBusSchool className="text-white ml-7" />
-                        <p className="flex mr-[100px] ">{order.type}</p>
+                  <hr />
+                  <div className="grid grid-cols-[30px_minmax(120px,_1fr)_120px] w-full pb-10 items-center">
+                    <div className="text-center">
+                      <img src="truck.svg" alt="" className="text-white-text-3xl" />
+                      <div className="spacer"></div>
+                      <img src="marker.svg" alt="" className="text-white-text-3xl" />
+                    </div>
+                    <div className="flex flex-col ml-2">
+                      <div className="w-full">
+                        <span className="text-sm block">PICKUP</span>
+                        <span className="text-tg block font-bold">
+                          {order.destinations[0].address.split(",")[order.destinations[0].address.split(",").length-2]}
+                        </span>
+                        <span className="text-truncate max-h-3">
+                          {order.destinations[0].address}
+                        </span>
                       </div>
-                      <div className="flex justify-center">
-                        <p>{order.status_string}</p>
+                      <div className="p-3"></div>
+                      <div className="w-full">
+                        <span className="text-sm block">DROPOFF</span>
+                        <span className="text-tg block font-bold">
+                          {order.destinations[1].address.split(",")[order.destinations[1].address.split(",").length-2]}
+                        </span>
+                        <span className="text-ellipsis">
+                          {order.destinations[1].address}
+                        </span>
                       </div>
-                      <div className="flex flex-col">
-                        <div className="flex p-2">
-                          <BiBox className="text-white text-5xl ml-7" />
-                          <div className="flex flex-col">
-                            <p className="flex">
-                              Pickup: {order.destinations[0].address}
-                            </p>
-                          </div>
-                        </div>
+                    </div>
+                    <div className="flex flex-col text-right">
+                      <div className="w-full">
+                        <span className="text-sm block">{new Date(order.start_date).toLocaleTimeString("es-ES", {hour: "2-digit",minute: "2-digit"})}</span>
+                        <span className="text-tg block font-bold">
+                          {new Date(order.start_date).toLocaleDateString("es-ES")}
+                        </span>
+                        
                       </div>
-                      <div className="flex">
-                        <button
-                          type="button"
-                          onClick={() => handleResumeClick(order._id)}
-                          className="flex justify-center bg-yellow-500 p-4 w-40 h-auto rounded-lg mt-12"
-                        >
-                          <BiExpandAlt className="text-white mr-4 text-2xl" />
-                          Resume
-                        </button>
-                        <div className="flex flex-col">
-                          <p className="flex">
-                            {new Date(order.start_date).toLocaleDateString(
-                              "es-ES"
-                            )}
-                          </p>
-                          <p className="flex ml-2 justify-end">
-                            {new Date(order.start_date).toLocaleDateString(
-                              "es-ES"
-                            )}
-                          </p>
-                        </div>
+                      <div className="p-3"></div>
+                      <div className="w-full">
+                        <span className="text-sm block">{new Date(order.end_date).toLocaleTimeString("es-ES", {hour: "2-digit",minute: "2-digit"})}</span>
+                        <span className="text-tg block font-bold">
+                          {new Date(order.end_date).toLocaleDateString("es-ES")}
+                        </span>
                       </div>
                     </div>
                   </div>
-                </li>
-              ))}
-            {!showAllOrders &&
-              Array.isArray(filteredData) &&
-              filteredData.map((order) => (
-                <li key={order._id} className="relative text-white">
-                  {/* Contenido de la orden filtrada */}
-                  <div className="flex align-items-center">
-                    <p className="mt-5 ml-3">Order #{order.order_number}</p>
-                  </div>
-                  <div className="flex items-start p-4 bg-gray-700 w-[450px] h-[292px] text-gray-200 rounded-lg mt-4 justify-start">
-                    <div className="flex flex-wrap">
-                      <div className="flex justify-center">
-                        <BiBusSchool className="text-white ml-7" />
-                        <p className="flex mr-[100px] ">{order.type}</p>
-                      </div>
-                      <div className="flex justify-center">
-                        <p>{order.status_string}</p>
-                      </div>
-                      <div className="flex flex-col">
-                        <div className="flex p-2">
-                          <BiBox className="text-white text-5xl ml-7" />
-                          <div className="flex flex-col">
-                            <p className="flex">
-                              Pickup: {order.destinations[0].address}
-                            </p>
-                            <p className="flex">
-                              Dropoff: {order.destinations[1].address}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="flex">
-                        <button
-                          type="button"
-                          onClick={() => handleResumeClick(order._id)}
-                          className="flex justify-center bg-yellow-500 p-4 w-40 h-auto rounded-lg mt-12"
-                        >
-                          <BiExpandAlt className="text-white mr-4 text-2xl" />
+                  <div className="grid grid-cols-2 w-full">
+                    <div className="">
+                    <button
+                      type="button"
+                      onClick={() => handleResumeClick(order._id)}
+                      className="flex justify-center bg-yellow-500 p-4 left_button w-40 h-auto rounded-lg"
+                      disabled={new Date() < new Date(order.start_date)}
+                    >
+                      {new Date() < new Date(order.start_date)
+                        ? "Start pickup in" + calculateTimeDifference(new Date(order.start_date))
+                        : "Navegar"}
+                    </button>
+
+                    </div>
+                    <div className="text-right">
+                      <button className="bg-yellow-500 text-black p-4 right_button w-40 h-auto rounded-lg align-center">
+                        <span className="inline-block">
                           Resume
-                        </button>
-                        <div className="flex flex-col">
-                          <p className="flex">
-                            {new Date(order.start_date).toLocaleDateString(
-                              "es-ES"
-                            )}
-                          </p>
-                          <p className="flex ml-2 justify-end">
-                            {new Date(order.start_date).toLocaleDateString(
-                              "es-ES"
-                            )}
-                          </p>
-                        </div>
+                        </span>
+                        <img src="eye.svg" alt="" className=" inline-block text-white-text-3xl pl-2" /> 
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        {!showAllOrders &&
+          Array.isArray(filteredData) &&
+          filteredData.map((order) => (
+            <div key={order._id} className="col-start-2 col-end-12">
+              <div className="flex align-items-center">
+                <p className="text-lg mt-5 ml-3">
+                  Order <strong className="ml-1">#{order.order_number}</strong>
+                </p>
+              </div>
+              <div className="card-bg rounded-[25px] flex items-start p-4 w-full  text-gray-200 rounded-lg mt-4 justify-start">
+                <div className="flex flex-wrap">
+                  <div className="grid grid-cols-2 w-full pb-2 card-header">
+                    <div className="inline-block align-center">
+                      <img src="freight.svg" alt="" className="text-white-text-3xl inline-block pr-2" />
+                      <span className="inline-block">{order.type}</span>
+                    </div>
+                    <div className="inline-block text-right mr-1">
+                      <div className={`${order.status_class} inline-block mr-1`}></div>
+                      <span>{order.status_string}</span>
+                    </div>
+                  </div>
+                  <hr />
+                  <div className="grid grid-cols-[30px_minmax(120px,_1fr)_120px] w-full pb-10 items-center">
+                    <div className="text-center">
+                      <img src="truck.svg" alt="" className="text-white-text-3xl" />
+                      <div className="spacer"></div>
+                      <img src="marker.svg" alt="" className="text-white-text-3xl" />
+                    </div>
+                    <div className="flex flex-col ml-2">
+                      <div className="w-full">
+                        <span className="text-sm block">PICKUP</span>
+                        <span className="text-tg block font-bold">
+                          {order.destinations[0].address.split(",")[order.destinations[0].address.split(",").length-2]}
+                        </span>
+                        <span className="text-truncate max-h-3">
+                          {order.destinations[0].address}
+                        </span>
+                      </div>
+                      <div className="p-3"></div>
+                      <div className="w-full">
+                        <span className="text-sm block">DROPOFF</span>
+                        <span className="text-tg block font-bold">
+                          {order.destinations[1].address.split(",")[order.destinations[1].address.split(",").length-2]}
+                        </span>
+                        <span className="text-ellipsis">
+                          {order.destinations[1].address}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex flex-col text-right">
+                      <div className="w-full">
+                        <span className="text-sm block">{new Date(order.start_date).toLocaleTimeString("es-ES", {hour: "2-digit",minute: "2-digit"})}</span>
+                        <span className="text-tg block font-bold">
+                          {new Date(order.start_date).toLocaleDateString("es-ES")}
+                        </span>
+                        
+                      </div>
+                      <div className="p-3"></div>
+                      <div className="w-full">
+                        <span className="text-sm block">{new Date(order.end_date).toLocaleTimeString("es-ES", {hour: "2-digit",minute: "2-digit"})}</span>
+                        <span className="text-tg block font-bold">
+                          {new Date(order.end_date).toLocaleDateString("es-ES")}
+                        </span>
                       </div>
                     </div>
                   </div>
-                  {/* Resto del contenido de la orden */}
-                </li>
-              ))}
-          </ul>
-        </div>
+                  <div className="grid grid-cols-2 w-full">
+                    <div className="">
+                    <button
+                      type="button"
+                      onClick={() => handleResumeClick(order._id)}
+                      className="flex justify-center bg-yellow-500 p-4 left_button w-40 h-auto rounded-lg"
+                      disabled={new Date() < new Date(order.start_date)}
+                    >
+                      {new Date() < new Date(order.start_date)
+                        ? "Start pickup in" + calculateTimeDifference(new Date(order.start_date))
+                        : "Navegar"}
+                    </button>
+
+                    </div>
+                    <div className="text-right">
+                      <button className="bg-yellow-500 text-black p-4 right_button w-40 h-auto rounded-lg align-center">
+                        <span className="inline-block">
+                          Resume
+                        </span>
+                        <img src="eye.svg" alt="" className=" inline-block text-white-text-3xl pl-2" /> 
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+          {!showAllOrders && filteredData.length === 0 &&  
+            <h1 className="text-red">
+              No hay coincidencias
+            </h1>
+          }
       </div>
     </>
   );
 };
 
 export default Order;
-
