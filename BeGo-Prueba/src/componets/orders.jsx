@@ -26,8 +26,8 @@ const Order = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleResumeClick = (orderId) => {
-    window.location.href = `/cargo}`; // Ruta de la página de información de la orden
+  const handleResumeClick = () => {
+    window.location.href = `/cargo`; // Ruta de la página de información de la orden
   };
 
   const handleSearch = () => {
@@ -124,7 +124,7 @@ const Order = () => {
                     <div className="">
                     <button
                       type="button"
-                      onClick={() => handleResumeClick(order._id)}
+                      onClick={() => handleResumeClick()}
                       className="flex justify-center bg-yellow-500 p-4 left_button w-40 h-auto rounded-lg"
                       disabled={new Date() < new Date(order.start_date)}
                     >
@@ -135,7 +135,10 @@ const Order = () => {
 
                     </div>
                     <div className="text-right">
-                      <button className="bg-yellow-500 text-black p-4 right_button w-40 h-auto rounded-lg align-center">
+                      <button 
+                        className="bg-yellow-500 text-black p-4 right_button w-40 h-auto rounded-lg align-center"
+                        onClick={() => handleResumeClick()}
+                        >
                         <span className="inline-block">
                           Resume
                         </span>
@@ -217,7 +220,6 @@ const Order = () => {
                     <div className="">
                     <button
                       type="button"
-                      onClick={() => handleResumeClick(order._id)}
                       className="flex justify-center bg-yellow-500 p-4 left_button w-40 h-auto rounded-lg"
                       disabled={new Date() < new Date(order.start_date)}
                     >
@@ -228,7 +230,10 @@ const Order = () => {
 
                     </div>
                     <div className="text-right">
-                      <button className="bg-yellow-500 text-black p-4 right_button w-40 h-auto rounded-lg align-center">
+                      <button 
+                        className="bg-yellow-500 text-black p-4 right_button w-40 h-auto rounded-lg align-center"
+                        onClick={() => handleResumeClick()}
+                        >
                         <span className="inline-block">
                           Resume
                         </span>
